@@ -1,0 +1,33 @@
+# Image de DÉVELOPPEMENT.
+# Résout @replang-app/* depuis les packages LOCAUX de Replang-infra
+# (aucune publication ni token nécessaire). Hot-reload via tsx.
+#
+# ⚠️ Contexte de build = dossier PARENT (Replang/), voir docker-compose.override.yml.
+FROM node:22-slim
+WORKDIR /app
+
+# OpenSSL : requis par le moteur Prisma (absent des images slim).
+RUN apt-get update && apt-get install -y --no-install-recommends openssl \
+ && rm -rf /var/lib/apt/lists/*
+
+# Packages partagés locaux (déjà buildés : dist + client Prisma généré).
+COPY Replang-infra/packages/db ./vendor/db
+COPY Replang-infra/packages/shared ./vendor/shared
+
+# Manifeste du service. On réécrit les deps @replang-app vers les packages
+# locaux (file:vendor/*) — le package.json committé garde, lui, les versions
+# publiées (^0.1.0) pour la CI/prod.
+COPY Replang-auth/package.json ./
+RUN node -e "const fs=require('fs');const p=require('./package.json');p.dependencies['@replang-app/db']='file:vendor/db';p.dependencies['@replang-app/shared']='file:vendor/shared';fs.writeFileSync('package.json',JSON.stringify(p,null,2));" \
+ && npm install
+
+# Régénère le client Prisma POUR la plateforme du conteneur (moteur Linux
+# correct, le client copié ayant été généré sous l'OS hôte).
+RUN npx --yes prisma@6.19.3 generate --schema ./vendor/db/prisma/schema.prisma
+
+# Code source (monté en volume en dev → hot-reload).
+COPY Replang-auth/tsconfig.json ./
+COPY Replang-auth/src ./src
+
+EXPOSE 3001
+CMD ["npm", "run", "dev"]

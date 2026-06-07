@@ -15,10 +15,11 @@
   },
   "dependencies": {
     "@fastify/cors": "^10.0.2",
-    "@replang-app/db": "file:../Replang-infra/packages/db",
-    "@replang-app/shared": "file:../Replang-infra/packages/shared",
+    "@replang-app/db": "^0.1.0",
+    "@replang-app/shared": "^0.1.0",
     "better-auth": "^1.6.14",
-    "fastify": "^5.2.0"
+    "fastify": "^5.2.0",
+    "ioredis": "^5.3.2"
   },
   "devDependencies": {
     "@types/node": "^22.10.5",

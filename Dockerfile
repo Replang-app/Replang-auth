@@ -13,7 +13,7 @@ ARG NPM_TOKEN
 ENV NPM_TOKEN=${NPM_TOKEN}
 
 COPY package*.json ./
-RUN npm ci
+RUN npm install
 
 COPY tsconfig.json ./
 COPY src ./src
@@ -29,7 +29,7 @@ ARG NPM_TOKEN
 ENV NPM_TOKEN=${NPM_TOKEN}
 
 COPY package*.json ./
-RUN npm ci --omit=dev && rm -f .npmrc
+RUN npm install --omit=dev && rm -f .npmrc
 
 COPY --from=builder /app/dist ./dist
 

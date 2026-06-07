@@ -11,5 +11,7 @@ export const env = loadEnv(
     BETTER_AUTH_URL: z.string().url().default("http://localhost:3001"),
     // Origines frontend autorisées (CORS + Better-Auth), séparées par des virgules.
     TRUSTED_ORIGINS: z.string().default("http://localhost:3000"),
+    // Redis optionnel : si absent, le rate-limit reste en mémoire (une instance).
+    REDIS_URL: z.string().url().optional(),
   }),
 );
