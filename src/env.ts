@@ -13,5 +13,12 @@ export const env = loadEnv(
     TRUSTED_ORIGINS: z.string().default("http://localhost:3000"),
     // Redis optionnel : si absent, le rate-limit reste en mémoire (une instance).
     REDIS_URL: z.string().url().optional(),
+    // Email — transport selon l'environnement :
+    //   prod : RESEND_API_KEY requis (resend.com) → SDK Resend
+    //   dev  : absent → Nodemailer vers Mailpit (SMTP local, UI sur :8025)
+    RESEND_API_KEY: z.string().optional(),
+    MAIL_FROM: z.string().default("noreply@replang.app"),
+    SMTP_HOST: z.string().default("mailpit"),
+    SMTP_PORT: z.coerce.number().default(1025),
   }),
 );

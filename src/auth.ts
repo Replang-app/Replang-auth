@@ -4,6 +4,8 @@ import { jwt } from "better-auth/plugins";
 import { prisma } from "@replang-app/db";
 import { Redis } from "ioredis";
 import { env } from "./env.js";
+import { sendMail } from "./mailer.js";
+import { verificationEmail, resetPasswordEmail } from "./emails.js";
 
 // Connexion Redis optionnelle : utilisée comme secondaryStorage si REDIS_URL est défini.
 // Permet au rate-limit et au cache de sessions d'être distribués (multi-instance).
@@ -50,6 +52,23 @@ export const auth = betterAuth({
 
   emailAndPassword: {
     enabled: true,
+    // Bloque la connexion tant que l'email n'est pas confirmé.
+    // Sans ça, quelqu'un peut s'inscrire avec l'adresse d'autrui et s'en servir.
+    requireEmailVerification: true,
+    sendResetPassword: async ({ user, url }) => {
+      const mail = resetPasswordEmail({ name: user.name, url });
+      await sendMail({ to: user.email, ...mail });
+    },
+  },
+
+  emailVerification: {
+    // Envoi automatique au sign-up (sans ça le callback existe mais n'est jamais appelé).
+    sendOnSignUp: true,
+    expiresIn: 60 * 60 * 24, // 24 heures
+    sendVerificationEmail: async ({ user, url }) => {
+      const mail = verificationEmail({ name: user.name, url });
+      await sendMail({ to: user.email, ...mail });
+    },
   },
 
   user: {
