@@ -1,0 +1,29 @@
+{
+  "name": "replang-auth",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Service d'authentification Replang (Fastify + Better-Auth + JWT/JWKS).",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "dev": "tsx watch src/server.ts",
+    "build": "tsc",
+    "start": "node dist/server.js",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@fastify/cors": "^10.0.2",
+    "@replang-app/db": "file:../Replang-infra/packages/db",
+    "@replang-app/shared": "file:../Replang-infra/packages/shared",
+    "better-auth": "^1.6.14",
+    "fastify": "^5.2.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.5",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.3"
+  },
+  "license": "UNLICENSED"
+}

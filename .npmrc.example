@@ -1,0 +1,9 @@
+# Pour installer @replang-app/db et @replang-app/shared depuis GitHub Packages
+# (registre npm privé). Copier en .npmrc et fournir NPM_TOKEN via l'env.
+#
+# ⚠️ En développement local actuel, ces packages sont référencés en `file:`
+# vers ../Replang-infra (voir package.json) et CE fichier n'est PAS nécessaire.
+# Il le deviendra dès qu'on publiera les packages (pour le build Docker / CI).
+
+@replang-app:registry=https://npm.pkg.github.com
+//npm.pkg.github.com/:_authToken=${NPM_TOKEN}
