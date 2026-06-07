@@ -12,7 +12,7 @@ COPY .npmrc.example .npmrc
 ARG NPM_TOKEN
 ENV NPM_TOKEN=${NPM_TOKEN}
 
-COPY package*.json ./
+COPY package.json ./
 RUN npm install
 
 COPY tsconfig.json ./
@@ -28,7 +28,7 @@ COPY .npmrc.example .npmrc
 ARG NPM_TOKEN
 ENV NPM_TOKEN=${NPM_TOKEN}
 
-COPY package*.json ./
+COPY package.json ./
 RUN npm install --omit=dev && rm -f .npmrc
 
 COPY --from=builder /app/dist ./dist
