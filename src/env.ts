@@ -20,5 +20,10 @@ export const env = loadEnv(
     MAIL_FROM: z.string().default("noreply@replang.app"),
     SMTP_HOST: z.string().default("mailpit"),
     SMTP_PORT: z.coerce.number().default(1025),
+    // OAuth — optionnels : le serveur démarre sans eux, la feature est juste désactivée.
+    GITHUB_CLIENT_ID: z.string().optional(),
+    GITHUB_CLIENT_SECRET: z.string().optional(),
+    GOOGLE_CLIENT_ID: z.string().optional(),
+    GOOGLE_CLIENT_SECRET: z.string().optional(),
   }),
 );

@@ -77,6 +77,17 @@ export const auth = betterAuth({
     },
   },
 
+  // Social providers inclus conditionnellement : le serveur démarre même sans credentials.
+  // Callback URL pattern : {BETTER_AUTH_URL}/api/auth/callback/{provider}
+  socialProviders: {
+    ...(env.GITHUB_CLIENT_ID && env.GITHUB_CLIENT_SECRET
+      ? { github: { clientId: env.GITHUB_CLIENT_ID, clientSecret: env.GITHUB_CLIENT_SECRET } }
+      : {}),
+    ...(env.GOOGLE_CLIENT_ID && env.GOOGLE_CLIENT_SECRET
+      ? { google: { clientId: env.GOOGLE_CLIENT_ID, clientSecret: env.GOOGLE_CLIENT_SECRET } }
+      : {}),
+  },
+
   // Protection brute-force sur toutes les routes /api/auth/*.
   rateLimit: {
     enabled: true,

@@ -15,6 +15,37 @@ await app.register(cors, {
 // Sonde de santé (utilisée par Docker / Traefik).
 app.get("/health", async () => ({ status: "ok", service: "auth" }));
 
+// Page de test OAuth — dev uniquement, jamais exposée en prod.
+// Sert du HTML sur la même origine que l'auth → pas de CSP/CORS, cookies partagés.
+if (env.NODE_ENV !== "production") {
+  app.get("/test-oauth", async (_, reply) => {
+    reply.type("text/html").send(`<!DOCTYPE html>
+<html lang="fr">
+<head><meta charset="UTF-8"><title>Test OAuth</title></head>
+<body style="font-family:sans-serif;padding:2rem;max-width:400px">
+  <h2>Test OAuth (dev)</h2>
+  <button onclick="login('github')">Connexion GitHub</button>
+  <button onclick="login('google')" style="margin-left:.5rem">Connexion Google</button>
+  <pre id="out" style="margin-top:1rem;font-size:12px;color:green"></pre>
+  <script>
+    async function login(provider) {
+      document.getElementById('out').textContent = 'Redirection vers ' + provider + '…';
+      const r = await fetch('/api/auth/sign-in/social', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ provider, callbackURL: location.href }),
+        credentials: 'include'
+      });
+      const data = await r.json();
+      if (data.url) window.location.href = data.url;
+      else document.getElementById('out').textContent = JSON.stringify(data, null, 2);
+    }
+  </script>
+</body>
+</html>`);
+  });
+}
+
 /**
  * Toutes les routes /api/auth/* sont déléguées au handler Better-Auth.
  * Better-Auth fonctionne avec l'API web standard (Request/Response) ; on
