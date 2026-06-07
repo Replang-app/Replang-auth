@@ -89,3 +89,40 @@ export function resetPasswordEmail(data: { name: string | null; url: string }) {
     ].join("\n"),
   };
 }
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Confirmation de changement d'email (étape 1.6)
+// Envoyé à l'adresse ACTUELLE pour confirmer le changement.
+// Sécurité : un attaquant avec une session volée ne peut pas changer l'email
+// sans accès à l'ancienne boîte mail.
+// ─────────────────────────────────────────────────────────────────────────────
+
+export function changeEmailEmail(data: { name: string | null; newEmail: string; url: string }) {
+  const greeting = data.name ? `Bonjour ${data.name},` : "Bonjour,";
+
+  return {
+    subject: "Confirmez le changement de votre email - Replang",
+    html: wrap(`
+      <h1 style="margin:0 0 8px;font-size:22px;font-weight:700;color:#111;">Changer votre adresse email</h1>
+      <p style="margin:0 0 24px;color:#444;font-size:15px;line-height:1.6;">
+        ${greeting}<br>
+        Vous avez demandé à changer votre email Replang vers
+        <strong>${data.newEmail}</strong>.<br>
+        Cliquez sur le bouton ci-dessous pour confirmer ce changement.
+      </p>
+      ${ctaButton(data.url, "Confirmer le changement")}
+      <p style="margin:16px 0 0;font-size:13px;color:#888;">
+        Si vous n'avez pas fait cette demande, ignorez cet email — votre adresse actuelle reste inchangée.
+      </p>
+    `),
+    text: [
+      greeting,
+      "",
+      `Vous avez demandé à changer votre email Replang vers : ${data.newEmail}`,
+      "Confirmez ce changement en cliquant sur ce lien :",
+      data.url,
+      "",
+      "Si vous n'avez pas fait cette demande, ignorez cet email.",
+    ].join("\n"),
+  };
+}

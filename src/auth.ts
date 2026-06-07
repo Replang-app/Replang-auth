@@ -5,7 +5,7 @@ import { prisma } from "@replang-app/db";
 import { Redis } from "ioredis";
 import { env } from "./env.js";
 import { sendMail } from "./mailer.js";
-import { verificationEmail, resetPasswordEmail } from "./emails.js";
+import { verificationEmail, resetPasswordEmail, changeEmailEmail } from "./emails.js";
 
 // Connexion Redis optionnelle : utilisée comme secondaryStorage si REDIS_URL est défini.
 // Permet au rate-limit et au cache de sessions d'être distribués (multi-instance).
@@ -73,7 +73,17 @@ export const auth = betterAuth({
 
   user: {
     additionalFields: {
-      displayName: { type: "string", required: false },
+      // updateable: true → inclus dans POST /api/auth/update-user
+      displayName: { type: "string", required: false, updateable: true },
+    },
+    changeEmail: {
+      enabled: true,
+      // Confirmation envoyée à l'adresse ACTUELLE : un attaquant avec une
+      // session volée ne peut pas changer l'email sans accès à l'ancienne boîte.
+      sendChangeEmailConfirmation: async ({ user, newEmail, url }) => {
+        const mail = changeEmailEmail({ name: user.name, newEmail, url });
+        await sendMail({ to: user.email, ...mail });
+      },
     },
   },
 
