@@ -1,0 +1,35 @@
+name: Build & push image auth
+
+# Build l'image de production et la publie sur GHCR à chaque push sur main.
+# Pré-requis : @replang-app/db et @replang-app/shared doivent être publiés
+# sur GitHub Packages (workflow publish-packages dans Replang-infra).
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          tags: ghcr.io/replang-app/replang-auth:latest
+          # GITHUB_TOKEN est éphémère (expire après le job) — acceptable en CI.
+          # Il a packages:read sur l'orga pour installer @replang-app/*.
+          build-args: |
+            NPM_TOKEN=${{ secrets.GITHUB_TOKEN }}
